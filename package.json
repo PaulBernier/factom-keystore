@@ -1,0 +1,27 @@
+{
+  "name": "factom-keystore",
+  "version": "0.1.0",
+  "description": "A keystore for Factom: Factoid keys, Entry Credit keys and Identity keys",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "factom",
+    "keystore",
+    "keys",
+    "blockchain",
+    "identity",
+    "factoid",
+    "entrycredit"
+  ],
+  "author": "Paul Bernier",
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^5.15.2"
+  },
+  "dependencies": {
+    "factom": "^1.0.0",
+    "key-store": "^1.0.1"
+  }
+}
