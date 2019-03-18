@@ -2,7 +2,7 @@
   "name": "factom-keystore",
   "version": "0.1.0",
   "description": "A keystore for Factom: Factoid keys, Entry Credit keys and Identity keys",
-  "main": "index.js",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -22,6 +22,10 @@
   },
   "dependencies": {
     "factom": "^1.0.0",
-    "key-store": "^1.0.1"
+    "factombip44": "^0.1.8",
+    "fast-sha256": "^1.1.0",
+    "fs-extra": "^7.0.1",
+    "key-store": "^1.0.1",
+    "tweetnacl": "^1.0.1"
   }
 }
