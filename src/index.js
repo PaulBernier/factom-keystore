@@ -4,14 +4,13 @@ const { pathExists, ensureFile, readJSON } = require('fs-extra');
 const writeFile = promisify(fs.writeFile);
 const path = require('path');
 
-
 const FactomKeyStore = require('./factom-key-store');
 
-async function createKeyStore(filePath, password, seed) {
+async function createKeyStore(filePath, password, data) {
     await createEmptyFile(filePath);
     const persist = getPersistFunction(filePath);
     const keyStore = new FactomKeyStore(persist, {}, password);
-    await keyStore.init(password, seed);
+    await keyStore.init(password, data);
     return keyStore;
 }
 

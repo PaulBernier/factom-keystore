@@ -22,10 +22,10 @@
   },
   "dependencies": {
     "factom": "^1.0.0",
+    "factom-identity-lib": "^0.2.0-rc4",
     "factombip44": "^0.1.8",
-    "fast-sha256": "^1.1.0",
     "fs-extra": "^7.0.1",
-    "key-store": "^1.0.1",
-    "tweetnacl": "^1.0.1"
+    "joi": "^14.3.1",
+    "key-store": "^1.0.1"
   }
 }
