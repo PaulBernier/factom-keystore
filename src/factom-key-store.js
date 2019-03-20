@@ -6,7 +6,7 @@ const { getPublicAddress,
     seedToPrivateFctAddress } = require('factom');
 const { getPublicIdentityKey,
     isValidPublicIdentityKey,
-    isValidPrivateIdentityKey,
+    isValidSecretIdentityKey,
     seedToSecretIdentityKey } = require('factom-identity-lib').digital;
 const bip44 = require('factombip44');
 const Joi = require('joi');
@@ -15,17 +15,20 @@ const EMPTY_KEY_STORE = {
     manuallyImportedKeys: {},
     seedGeneratedCounter: 0,
     keys: {}
-}; 
+};
+
+const NOOP = async () => { };
 
 class FactomKeyStore {
-    constructor(save, initialData, password) {
+    constructor(arg) {
+        const { save = NOOP, initialData, password } = arg || {};
         this.store = createStore(save, initialData);
         this.password = password;
     }
 
-    async init(password, data) {
-        if (this.store.getKeyIDs.length > 0) {
-            throw new Error('Cannot initialize a non empty store');
+    async init(data, password) {
+        if (this.store.getKeyIDs().length > 0) {
+            throw new Error('Cannot initialize an already initialized key store');
         }
 
         const pwd = this.getPassword(password);
@@ -37,10 +40,6 @@ class FactomKeyStore {
             this.store.saveKey('fct', pwd, fct),
             this.store.saveKey('ec', pwd, ec),
             this.store.saveKey('identity', pwd, identity)]);
-    }
-
-    setPassword(password) {
-        this.password = password;
     }
 
     getPassword(password) {
@@ -78,7 +77,7 @@ class FactomKeyStore {
             } else {
                 return importKey(this.store, pwd, 'fct', { public: getPublicAddress(secret), secret });
             }
-        } else if (isValidPrivateIdentityKey(secret)) {
+        } else if (isValidSecretIdentityKey(secret)) {
             return importKey(this.store, pwd, 'identity', { public: getPublicIdentityKey(secret), secret });
         } else {
             throw new Error('Invalid secret: cannot import');
@@ -116,7 +115,7 @@ class FactomKeyStore {
 
     getAllIdentityKeys(password) {
         const pwd = this.getPassword(password);
-        return (this.store.getPrivateKeyData('identity', pwd).keys);
+        return Object.keys(this.store.getPrivateKeyData('identity', pwd).keys);
     }
 
     async generateFactoidAddress(password) {

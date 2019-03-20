@@ -6,11 +6,11 @@ const path = require('path');
 
 const FactomKeyStore = require('./factom-key-store');
 
-async function createKeyStore(filePath, password, data) {
+async function createFileKeyStore(filePath, password, data) {
     await createEmptyFile(filePath);
     const persist = getPersistFunction(filePath);
-    const keyStore = new FactomKeyStore(persist, {}, password);
-    await keyStore.init(password, data);
+    const keyStore = new FactomKeyStore({ save: persist, password });
+    await keyStore.init(data, password);
     return keyStore;
 }
 
@@ -22,10 +22,10 @@ async function createEmptyFile(filePath) {
     await ensureFile(absoluteFilePath);
 }
 
-async function getKeyStore(filePath, password) {
+async function getFileKeyStore(filePath, password) {
     const storeData = await readJSON(filePath);
     const persist = getPersistFunction(filePath);
-    return new FactomKeyStore(persist, storeData, password);
+    return new FactomKeyStore({ save: persist, initialData: storeData, password });
 }
 
 function getPersistFunction(filePath) {
@@ -33,6 +33,6 @@ function getPersistFunction(filePath) {
 }
 
 module.exports = {
-    createKeyStore,
-    getKeyStore
+    createFileKeyStore,
+    getFileKeyStore
 };

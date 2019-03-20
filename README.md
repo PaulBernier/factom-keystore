@@ -6,3 +6,4 @@ Supports encrypted storage of:
 * Digital Identity keys
 
 Also supports address/key generation from a 12-word mnemonic seed.
+

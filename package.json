@@ -4,7 +4,11 @@
   "description": "A keystore for Factom: Factoid keys, Entry Credit keys and Identity keys",
   "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "eslint src/",
+    "prepublishOnly": "npm run lint && npm run test",
+    "test": "mocha 'test/*.spec.js'",
+    "coverage": "nyc --reporter=html --reporter=text mocha 'test/*.spec.js'",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls"
   },
   "keywords": [
     "factom",
@@ -18,7 +22,11 @@
   "author": "Paul Bernier",
   "license": "MIT",
   "devDependencies": {
-    "eslint": "^5.15.2"
+    "chai": "^4.2.0",
+    "coveralls": "^3.0.3",
+    "eslint": "^5.15.2",
+    "mocha": "^6.0.2",
+    "nyc": "^13.3.0"
   },
   "dependencies": {
     "factom": "^1.0.0",
