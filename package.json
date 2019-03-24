@@ -32,13 +32,13 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "coveralls": "^3.0.3",
-    "eslint": "^5.15.2",
+    "eslint": "^5.15.3",
     "mocha": "^6.0.2",
     "nyc": "^13.3.0"
   },
   "dependencies": {
-    "factom": "^1.0.0",
-    "factom-identity-lib": "^0.2.0-rc4",
+    "factom": "^1.0.2",
+    "factom-identity-lib": "^0.2.0-rc5",
     "factombip44": "^0.1.8",
     "fs-extra": "^7.0.1",
     "joi": "^14.3.1",

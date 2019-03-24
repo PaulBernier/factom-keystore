@@ -2,7 +2,7 @@ const assert = require('chai').assert,
     bip44 = require('factombip44'),
     { seedToPrivateEcAddress,
         seedToPrivateFctAddress } = require('factom'),
-    { seedToSecretIdentityKey } = require('factom-identity-lib').digital,
+    { seedToSecretIdentityKey } = require('factom-identity-lib').app,
     FactomKeyStore = require('../src/factom-key-store');
 
 const PWD = 'password';

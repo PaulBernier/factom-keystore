@@ -7,7 +7,7 @@ const { getPublicAddress,
 const { getPublicIdentityKey,
     isValidPublicIdentityKey,
     isValidSecretIdentityKey,
-    seedToSecretIdentityKey } = require('factom-identity-lib').digital;
+    seedToSecretIdentityKey } = require('factom-identity-lib').app;
 const bip44 = require('factombip44');
 const Joi = require('joi');
 
@@ -223,10 +223,7 @@ const BACKUP_V1_SCHEMA = Joi.object().keys({
 
 function getBackupData(backup) {
     if (backup.version === 1) {
-        const validation = Joi.validate(backup, BACKUP_V1_SCHEMA);
-        if (validation.error) {
-            throw new Error(validation.error);
-        }
+        Joi.assert(backup, BACKUP_V1_SCHEMA);
         return backup;
     } else {
         throw new Error(`Unsupported backup version: ${backup}`);
