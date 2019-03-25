@@ -1,47 +1,63 @@
 {
-  "name": "factom-keystore",
-  "version": "0.1.0",
-  "description": "A keystore for Factom: Factoid keys, Entry Credit keys and Identity keys",
-  "main": "src/index.js",
-  "scripts": {
-    "lint": "eslint src/",
-    "prepublishOnly": "npm run lint && npm run test",
-    "test": "mocha 'test/*.spec.js'",
-    "coverage": "nyc --reporter=html --reporter=text mocha 'test/*.spec.js'",
-    "coveralls": "nyc report --reporter=text-lcov | coveralls"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/PaulBernier/factom-keystore.git"
-  },
-  "keywords": [
-    "factom",
-    "keystore",
-    "keys",
-    "blockchain",
-    "identity",
-    "factoid",
-    "entrycredit"
-  ],
-  "author": "Paul Bernier",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/PaulBernier/factom-keystore/issues"
-  },
-  "homepage": "https://github.com/PaulBernier/factom-keystore#readme",
-  "devDependencies": {
-    "chai": "^4.2.0",
-    "coveralls": "^3.0.3",
-    "eslint": "^5.15.3",
-    "mocha": "^6.0.2",
-    "nyc": "^13.3.0"
-  },
-  "dependencies": {
-    "factom": "^1.0.2",
-    "factom-identity-lib": "^0.2.0-rc5",
-    "factombip44": "^0.1.8",
-    "fs-extra": "^7.0.1",
-    "joi": "^14.3.1",
-    "key-store": "^1.0.1"
-  }
+    "name": "factom-keystore",
+    "version": "0.1.0",
+    "description": "A keystore for Factom: Factoid keys, Entry Credit keys and Identity keys",
+    "main": "src/index.js",
+    "scripts": {
+        "lint": "eslint \"{src,test}/**/*.js\"",
+        "format": "prettier --write \"{src,test}/**/*.js\"",
+        "prepublishOnly": "npm run format && npm run lint && npm run test",
+        "test": "mocha 'test/*.spec.js'",
+        "coverage": "nyc --reporter=html --reporter=text mocha 'test/*.spec.js'",
+        "coveralls": "nyc report --reporter=text-lcov | coveralls"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/PaulBernier/factom-keystore.git"
+    },
+    "keywords": [
+        "factom",
+        "keystore",
+        "keys",
+        "blockchain",
+        "identity",
+        "factoid",
+        "entrycredit"
+    ],
+    "author": "Paul Bernier",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/PaulBernier/factom-keystore/issues"
+    },
+    "homepage": "https://github.com/PaulBernier/factom-keystore#readme",
+    "devDependencies": {
+        "chai": "^4.2.0",
+        "coveralls": "^3.0.3",
+        "eslint": "^5.15.3",
+        "husky": "^1.3.1",
+        "lint-staged": "^8.1.5",
+        "mocha": "^6.0.2",
+        "nyc": "^13.3.0",
+        "prettier": "^1.16.4"
+    },
+    "dependencies": {
+        "factom": "^1.0.2",
+        "factom-identity-lib": "^0.2.0-rc5",
+        "factombip44": "^0.1.8",
+        "fs-extra": "^7.0.1",
+        "joi": "^14.3.1",
+        "key-store": "^1.0.1"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.js": [
+            "eslint --fix",
+            "prettier --write",
+            "git add"
+        ]
+    }
 }

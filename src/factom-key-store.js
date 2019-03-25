@@ -1,13 +1,17 @@
 const { createStore } = require('key-store');
-const { getPublicAddress,
+const {
+    getPublicAddress,
     isValidPrivateAddress,
     isValidPublicAddress,
     seedToPrivateEcAddress,
-    seedToPrivateFctAddress } = require('factom');
-const { getPublicIdentityKey,
+    seedToPrivateFctAddress
+} = require('factom');
+const {
+    getPublicIdentityKey,
     isValidPublicIdentityKey,
     isValidSecretIdentityKey,
-    seedToSecretIdentityKey } = require('factom-identity-lib').app;
+    seedToSecretIdentityKey
+} = require('factom-identity-lib').app;
 const bip44 = require('factombip44');
 const Joi = require('joi');
 
@@ -17,7 +21,7 @@ const EMPTY_KEY_STORE = {
     keys: {}
 };
 
-const NOOP = async () => { };
+const NOOP = async () => {};
 
 class FactomKeyStore {
     constructor(arg) {
@@ -39,7 +43,8 @@ class FactomKeyStore {
             this.store.saveKey('seed', pwd, seed, { version: 1, creationDate: Date.now() }),
             this.store.saveKey('fct', pwd, fct),
             this.store.saveKey('ec', pwd, ec),
-            this.store.saveKey('identity', pwd, identity)]);
+            this.store.saveKey('identity', pwd, identity)
+        ]);
     }
 
     getPassword(password) {
@@ -73,12 +78,21 @@ class FactomKeyStore {
 
         if (isValidPrivateAddress(secret)) {
             if (secret[0] === 'E') {
-                return importKey(this.store, pwd, 'ec', { public: getPublicAddress(secret), secret });
+                return importKey(this.store, pwd, 'ec', {
+                    public: getPublicAddress(secret),
+                    secret
+                });
             } else {
-                return importKey(this.store, pwd, 'fct', { public: getPublicAddress(secret), secret });
+                return importKey(this.store, pwd, 'fct', {
+                    public: getPublicAddress(secret),
+                    secret
+                });
             }
         } else if (isValidSecretIdentityKey(secret)) {
-            return importKey(this.store, pwd, 'identity', { public: getPublicIdentityKey(secret), secret });
+            return importKey(this.store, pwd, 'identity', {
+                public: getPublicIdentityKey(secret),
+                secret
+            });
         } else {
             throw new Error('Invalid secret: cannot import');
         }
@@ -122,7 +136,8 @@ class FactomKeyStore {
         const pwd = this.getPassword(password);
         return generateKey({
             store: this.store,
-            pwd, type: 'fct',
+            pwd,
+            type: 'fct',
             seed: this.getSeed(),
             secretToPub: getPublicAddress,
             seedToHumanReadable: seedToPrivateFctAddress,
@@ -134,7 +149,8 @@ class FactomKeyStore {
         const pwd = this.getPassword(password);
         return generateKey({
             store: this.store,
-            pwd, type: 'ec',
+            pwd,
+            type: 'ec',
             seed: this.getSeed(),
             secretToPub: getPublicAddress,
             seedToHumanReadable: seedToPrivateEcAddress,
@@ -146,7 +162,8 @@ class FactomKeyStore {
         const pwd = this.getPassword(password);
         return generateKey({
             store: this.store,
-            pwd, type: 'identity',
+            pwd,
+            type: 'identity',
             seed: this.getSeed(),
             secretToPub: getPublicIdentityKey,
             seedToHumanReadable: seedToSecretIdentityKey,
@@ -164,7 +181,15 @@ function importKey(store, password, type, key) {
     return store.saveKey(type, password, keyStore);
 }
 
-async function generateKey({ store, pwd, seed, type, secretToPub, seedToHumanReadable, generateFn }) {
+async function generateKey({
+    store,
+    pwd,
+    seed,
+    type,
+    secretToPub,
+    seedToHumanReadable,
+    generateFn
+}) {
     // Read
     const keyStore = store.getPrivateKeyData(type, pwd);
     const counter = keyStore.seedGeneratedCounter;
@@ -180,7 +205,8 @@ async function generateKey({ store, pwd, seed, type, secretToPub, seedToHumanRea
     await store.saveKey(type, pwd, keyStore);
 
     return {
-        public: pub, secret
+        public: pub,
+        secret
     };
 }
 
@@ -209,7 +235,9 @@ function getInitialStoreData(data) {
 
 const KEY_STORE_SCHEMA = Joi.object().keys({
     manuallyImportedKeys: Joi.object().required(),
-    seedGeneratedCounter: Joi.number().integer().min(0),
+    seedGeneratedCounter: Joi.number()
+        .integer()
+        .min(0),
     keys: Joi.object().required()
 });
 
