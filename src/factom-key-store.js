@@ -12,6 +12,7 @@ const {
     isValidSecretIdentityKey,
     seedToSecretIdentityKey
 } = require('factom-identity-lib').app;
+const bip39 = require('bip39');
 const bip44 = require('factombip44');
 const Joi = require('joi');
 
@@ -37,10 +38,15 @@ class FactomKeyStore {
 
         const pwd = this.getPassword(password);
 
-        const { seed, fct, ec, identity } = getInitialStoreData(data);
+        const { mnemonic, fct, ec, identity } = getInitialStoreData(data);
+        // TODO: use mnemonicToSeedAsync when bip39 2.6.0 is released
+        // https://github.com/bitcoinjs/bip39/issues/101
+        const seed = bip39.mnemonicToSeedHex(mnemonic);
+        this.hdWallet = new bip44.FactomHDWallet({ seed });
 
         await Promise.all([
-            this.store.saveKey('seed', pwd, seed, { version: 1, creationDate: Date.now() }),
+            this.store.saveKey('mnemonic', pwd, mnemonic, { version: 1, creationDate: Date.now() }),
+            this.store.saveKey('seed', pwd, seed),
             this.store.saveKey('fct', pwd, fct),
             this.store.saveKey('ec', pwd, ec),
             this.store.saveKey('identity', pwd, identity)
@@ -55,6 +61,11 @@ class FactomKeyStore {
         return pwd;
     }
 
+    getMnemonic(password) {
+        const pwd = this.getPassword(password);
+        return this.store.getPrivateKeyData('mnemonic', pwd);
+    }
+
     getSeed(password) {
         const pwd = this.getPassword(password);
         return this.store.getPrivateKeyData('seed', pwd);
@@ -66,6 +77,7 @@ class FactomKeyStore {
 
         backup.version = 1;
         backup.seed = this.store.getPrivateKeyData('seed', pwd);
+        backup.mnemonic = this.store.getPrivateKeyData('mnemonic', pwd);
         backup.ec = this.store.getPrivateKeyData('ec', pwd);
         backup.fct = this.store.getPrivateKeyData('fct', pwd);
         backup.identity = this.store.getPrivateKeyData('identity', pwd);
@@ -134,11 +146,9 @@ class FactomKeyStore {
 
     async generateFactoidAddress(password) {
         const pwd = this.getPassword(password);
-        return generateKey({
-            store: this.store,
+        return generateKey.call(this, {
             pwd,
             type: 'fct',
-            seed: this.getSeed(),
             secretToPub: getPublicAddress,
             seedToHumanReadable: seedToPrivateFctAddress,
             generateFn: 'generateFactoidPrivateKey'
@@ -147,11 +157,9 @@ class FactomKeyStore {
 
     async generateEntryCreditAddress(password) {
         const pwd = this.getPassword(password);
-        return generateKey({
-            store: this.store,
+        return generateKey.call(this, {
             pwd,
             type: 'ec',
-            seed: this.getSeed(),
             secretToPub: getPublicAddress,
             seedToHumanReadable: seedToPrivateEcAddress,
             generateFn: 'generateEntryCreditPrivateKey'
@@ -160,11 +168,9 @@ class FactomKeyStore {
 
     async generateIdentityKey(password) {
         const pwd = this.getPassword(password);
-        return generateKey({
-            store: this.store,
+        return generateKey.call(this, {
             pwd,
             type: 'identity',
-            seed: this.getSeed(),
             secretToPub: getPublicIdentityKey,
             seedToHumanReadable: seedToSecretIdentityKey,
             generateFn: 'generateIdentityPrivateKey'
@@ -181,28 +187,24 @@ function importKey(store, password, type, key) {
     return store.saveKey(type, password, keyStore);
 }
 
-async function generateKey({
-    store,
-    pwd,
-    seed,
-    type,
-    secretToPub,
-    seedToHumanReadable,
-    generateFn
-}) {
+async function generateKey({ pwd, type, secretToPub, seedToHumanReadable, generateFn }) {
+    // Lazy loading of HDWallet
+    if (!this.hdWallet) {
+        this.hdWallet = new bip44.FactomHDWallet({ seed: this.getSeed(pwd) });
+    }
+
     // Read
-    const keyStore = store.getPrivateKeyData(type, pwd);
+    const keyStore = this.store.getPrivateKeyData(type, pwd);
     const counter = keyStore.seedGeneratedCounter;
 
     // Generate
-    const generator = new bip44.FactomBIP44(seed);
-    const secret = seedToHumanReadable(generator[generateFn](0, 0, counter));
+    const secret = seedToHumanReadable(this.hdWallet[generateFn](0, 0, counter));
     const pub = secretToPub(secret);
 
     // Write
     keyStore.seedGeneratedCounter++;
     keyStore.keys[pub] = secret;
-    await store.saveKey(type, pwd, keyStore);
+    await this.store.saveKey(type, pwd, keyStore);
 
     return {
         public: pub,
@@ -211,16 +213,16 @@ async function generateKey({
 }
 
 function getInitialStoreData(data) {
-    let seed,
+    let mnemonic,
         ec = EMPTY_KEY_STORE,
         fct = EMPTY_KEY_STORE,
         identity = EMPTY_KEY_STORE;
 
     if (!data) {
-        seed = bip44.randomMnemonic();
+        mnemonic = bip44.randomMnemonic();
     } else if (typeof data === 'string') {
         if (bip44.validMnemonic(data)) {
-            seed = data;
+            mnemonic = data;
         } else {
             throw new Error(`Invalid mnemonic seed provided: ${data}`);
         }
@@ -230,7 +232,7 @@ function getInitialStoreData(data) {
         throw new Error('Invalid initialization data');
     }
 
-    return { seed, ec, fct, identity };
+    return { mnemonic, ec, fct, identity };
 }
 
 const KEY_STORE_SCHEMA = Joi.object().keys({
@@ -243,6 +245,7 @@ const KEY_STORE_SCHEMA = Joi.object().keys({
 
 const BACKUP_V1_SCHEMA = Joi.object().keys({
     version: Joi.any().valid(1),
+    mnemonic: Joi.string().required(),
     seed: Joi.string().required(),
     ec: KEY_STORE_SCHEMA.required(),
     fct: KEY_STORE_SCHEMA.required(),

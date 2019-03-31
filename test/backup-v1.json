@@ -1,28 +1,27 @@
 {
     "version": 1,
-    "seed": "gather topple sadness body valve correct north dignity pass ignore random wish",
+    "seed": "29a590e01e1202eccb4af497f130b84fc6dab2caf27bb607255968b794069205b40f580d43f57026c26cff241e7dd54a5fe369826ca66e5c4acd24ff0f2d5e65",
+    "mnemonic": "magnet trust card carbon option pond this idle suffer chest example piano",
     "ec": {
         "manuallyImportedKeys": {},
         "seedGeneratedCounter": 1,
         "keys": {
-            "EC3SrYc7dYCBTyK19SAvSTbeaV3ke2wyPLaFguXwgWbxVFgZJWTa": "Es3fEKioerPJGumkBneJ7aHggoSuoAUyPFJivQdUWK9GZvuXVA5a"
+            "EC2asvKT6TyUEqYe4uGCAc7xY5HvcwGQwjmL5ku8ra2wE2E4xicL": "Es3wLEtEtpYfKPcm83Fqotni88qTxKok7bMvS28wda3rSFui3RDY"
         }
     },
     "fct": {
         "manuallyImportedKeys": {},
         "seedGeneratedCounter": 1,
         "keys": {
-            "FA3JasumZ1PgpmeHZfsSbHnKd4BUMcCXhXBk55eWvXH2hcwqCELx": "Fs2wL13aNHmAge8tWndipse3HrRN1REL6XwduKSNyqCTQMUaf6rB"
+            "FA32mpZSbGipZxPeVmr6S2SnGix2MypE4vdh9bsc7f5Sm86aTYaK": "Fs2CYXbm1HLgXZM4Js29DMNNMjtKXBcXWf9p2HC5BxSbycy3eDvU"
         }
     },
     "identity": {
-        "manuallyImportedKeys": {
-            "idpub1p5K8XqqGD9jZxXaaznJEWFzcQC54d9RGRu4NWyoWdM5nV6Rm8": true
-        },
+        "manuallyImportedKeys": { "idpub1p5K8XqqGD9jZxXaaznJEWFzcQC54d9RGRu4NWyoWdM5nV6Rm8": true },
         "seedGeneratedCounter": 1,
         "keys": {
             "idpub1p5K8XqqGD9jZxXaaznJEWFzcQC54d9RGRu4NWyoWdM5nV6Rm8": "idsec1B5cDbNNB4s1cQSZt24u3j1QtB5DsjFyBSmXqpUs645fJ3ot9C",
-            "idpub3Je7aTXnZ9DMWrSaP4Mjn7XrC1kTCCTtG4kJuACsVs53pozw88": "idsec1mH6xj73ERnxZ8jaA7yn7VDQGFU2YoSEDEHM9fJg6pcKxnXSJj"
+            "idpub2dkApjpUN8F5qsytZab5LBeV9q3AQpqAnLxbRrZ1jLWBzXG7NU": "idsec33e3a1EAkmSbEcXcnRs4DXAaF3HbuDhWD2423DvvNbA7FuJLra"
         }
     }
 }

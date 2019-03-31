@@ -11,7 +11,8 @@ describe('FactomKeyStore', function() {
         const ks = new FactomKeyStore();
         await ks.init(undefined, PWD);
 
-        assert.isTrue(bip44.validMnemonic(ks.getSeed(PWD)));
+        assert.isTrue(bip44.validMnemonic(ks.getMnemonic(PWD)));
+        assert.isNotEmpty(ks.getSeed(PWD));
         assert.isEmpty(ks.getAllEntryCreditAddresses(PWD));
         assert.isEmpty(ks.getAllFactoidAddresses(PWD));
         assert.isEmpty(ks.getAllIdentityKeys(PWD));
@@ -21,7 +22,8 @@ describe('FactomKeyStore', function() {
         const ks = new FactomKeyStore({ password: PWD });
         await ks.init();
 
-        assert.isTrue(bip44.validMnemonic(ks.getSeed()));
+        assert.isTrue(bip44.validMnemonic(ks.getMnemonic()));
+        assert.isNotEmpty(ks.getSeed(PWD));
         assert.isEmpty(ks.getAllEntryCreditAddresses());
         assert.isEmpty(ks.getAllFactoidAddresses());
         assert.isEmpty(ks.getAllIdentityKeys());
@@ -29,10 +31,11 @@ describe('FactomKeyStore', function() {
 
     it('Should initialize key store with seed', async function() {
         const ks = new FactomKeyStore({ password: PWD });
-        const seed = bip44.randomMnemonic();
-        await ks.init(seed);
+        const mnemonic = bip44.randomMnemonic();
+        await ks.init(mnemonic);
 
-        assert.strictEqual(ks.getSeed(), seed);
+        assert.strictEqual(ks.getMnemonic(), mnemonic);
+        assert.isNotEmpty(ks.getSeed(PWD));
         assert.isEmpty(ks.getAllEntryCreditAddresses());
         assert.isEmpty(ks.getAllFactoidAddresses());
         assert.isEmpty(ks.getAllIdentityKeys());
@@ -70,20 +73,21 @@ describe('FactomKeyStore', function() {
         const ecAddresses = ks.getAllEntryCreditAddresses();
         const identityKeys = ks.getAllIdentityKeys();
 
+        assert.strictEqual(ks.getMnemonic(), backup.mnemonic);
         assert.strictEqual(ks.getSeed(), backup.seed);
         assert.lengthOf(fctAddresses, 1);
         assert.lengthOf(ecAddresses, 1);
         assert.lengthOf(identityKeys, 2);
-        assert.isDefined(ks.getSecretKey('EC3SrYc7dYCBTyK19SAvSTbeaV3ke2wyPLaFguXwgWbxVFgZJWTa'));
-        assert.isDefined(ks.getSecretKey('FA3JasumZ1PgpmeHZfsSbHnKd4BUMcCXhXBk55eWvXH2hcwqCELx'));
+        assert.isDefined(ks.getSecretKey('EC2asvKT6TyUEqYe4uGCAc7xY5HvcwGQwjmL5ku8ra2wE2E4xicL'));
+        assert.isDefined(ks.getSecretKey('FA32mpZSbGipZxPeVmr6S2SnGix2MypE4vdh9bsc7f5Sm86aTYaK'));
         assert.isDefined(
             ks.getSecretKey('idpub1p5K8XqqGD9jZxXaaznJEWFzcQC54d9RGRu4NWyoWdM5nV6Rm8')
         );
         assert.isDefined(
-            ks.getSecretKey('idpub3Je7aTXnZ9DMWrSaP4Mjn7XrC1kTCCTtG4kJuACsVs53pozw88')
+            ks.getSecretKey('idpub1p5K8XqqGD9jZxXaaznJEWFzcQC54d9RGRu4NWyoWdM5nV6Rm8')
         );
 
-        const generator = new bip44.FactomBIP44(backup.seed);
+        const generator = new bip44.FactomHDWallet({ seed: backup.seed });
         const fctAddress = await ks.generateFactoidAddress();
         const ecAddress = await ks.generateEntryCreditAddress();
         const identityKey = await ks.generateIdentityKey();
@@ -261,8 +265,8 @@ describe('FactomKeyStore', function() {
 
     it('Should get backup v1', async function() {
         const ks = new FactomKeyStore({ password: PWD });
-        const seed = bip44.randomMnemonic();
-        await ks.init(seed);
+        const mnemonic = bip44.randomMnemonic();
+        await ks.init(mnemonic);
 
         await ks.import('idsec1B5cDbNNB4s1cQSZt24u3j1QtB5DsjFyBSmXqpUs645fJ3ot9C');
         const ecAddress = await ks.generateEntryCreditAddress();
@@ -272,7 +276,7 @@ describe('FactomKeyStore', function() {
         const backup = ks.getBackup();
 
         assert.strictEqual(backup.version, 1);
-        assert.strictEqual(backup.seed, seed);
+        assert.strictEqual(backup.mnemonic, mnemonic);
 
         const fctKeys = {};
         fctKeys[fctAddress.public] = fctAddress.secret;
