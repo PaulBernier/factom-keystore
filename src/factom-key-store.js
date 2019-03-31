@@ -1,4 +1,4 @@
-const { createStore } = require('key-store');
+const { createStore } = require('./key-store');
 const {
     getPublicAddress,
     isValidPrivateAddress,
@@ -44,12 +44,16 @@ class FactomKeyStore {
         const seed = bip39.mnemonicToSeedHex(mnemonic);
         this.hdWallet = new bip44.FactomHDWallet({ seed });
 
-        await Promise.all([
-            this.store.saveKey('mnemonic', pwd, mnemonic, { version: 1, creationDate: Date.now() }),
-            this.store.saveKey('seed', pwd, seed),
-            this.store.saveKey('fct', pwd, fct),
-            this.store.saveKey('ec', pwd, ec),
-            this.store.saveKey('identity', pwd, identity)
+        await this.store.saveKeys(pwd, [
+            {
+                keyID: 'mnemonic',
+                privateData: mnemonic,
+                publicData: { version: 1, creationDate: Date.now() }
+            },
+            { keyID: 'seed', privateData: seed },
+            { keyID: 'fct', privateData: fct },
+            { keyID: 'ec', privateData: ec },
+            { keyID: 'identity', privateData: identity }
         ]);
     }
 
