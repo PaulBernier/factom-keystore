@@ -39,9 +39,7 @@ class FactomKeyStore {
         const pwd = this.getPassword(password);
 
         const { mnemonic, fct, ec, identity } = getInitialStoreData(data);
-        // TODO: use mnemonicToSeedAsync when bip39 2.6.0 is released
-        // https://github.com/bitcoinjs/bip39/issues/101
-        const seed = bip39.mnemonicToSeedHex(mnemonic);
+        const seed = await bip39.mnemonicToSeedHexAsync(mnemonic);
         this.hdWallet = new bip44.FactomHDWallet({ seed });
 
         await this.store.saveKeys(pwd, [

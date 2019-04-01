@@ -43,7 +43,7 @@
         "prettier": "^1.16.4"
     },
     "dependencies": {
-        "bip39": "^2.5.0",
+        "bip39": "^2.6.0",
         "factom": "^1.0.2",
         "factom-identity-lib": "^0.2.0-rc6",
         "factombip44": "^0.2.1",
