@@ -148,36 +148,39 @@ class FactomKeyStore {
         return Object.keys(this.store.getPrivateKeyData('identity', pwd).keys);
     }
 
-    async generateFactoidAddress(password) {
+    async generateFactoidAddress(n = 1, password) {
         const pwd = this.getPassword(password);
-        return generateKey.call(this, {
+        return generateKeys.call(this, {
             pwd,
+            n,
             type: 'fct',
             secretToPub: getPublicAddress,
             seedToHumanReadable: seedToPrivateFctAddress,
-            generateFn: 'generateFactoidPrivateKey'
+            getChain: 'getFactoidChain'
         });
     }
 
-    async generateEntryCreditAddress(password) {
+    async generateEntryCreditAddress(n = 1, password) {
         const pwd = this.getPassword(password);
-        return generateKey.call(this, {
+        return generateKeys.call(this, {
             pwd,
+            n,
             type: 'ec',
             secretToPub: getPublicAddress,
             seedToHumanReadable: seedToPrivateEcAddress,
-            generateFn: 'generateEntryCreditPrivateKey'
+            getChain: 'getEntryCreditChain'
         });
     }
 
-    async generateIdentityKey(password) {
+    async generateIdentityKey(n = 1, password) {
         const pwd = this.getPassword(password);
-        return generateKey.call(this, {
+        return generateKeys.call(this, {
             pwd,
+            n,
             type: 'identity',
             secretToPub: getPublicIdentityKey,
             seedToHumanReadable: seedToSecretIdentityKey,
-            generateFn: 'generateIdentityPrivateKey'
+            getChain: 'getIdentityChain'
         });
     }
 }
@@ -191,7 +194,7 @@ function importKey(store, password, type, key) {
     return store.saveKey(type, password, keyStore);
 }
 
-async function generateKey({ pwd, type, secretToPub, seedToHumanReadable, generateFn }) {
+async function generateKeys({ pwd, type, n, secretToPub, seedToHumanReadable, getChain }) {
     // Lazy loading of HDWallet
     if (!this.hdWallet) {
         this.hdWallet = new bip44.FactomHDWallet({ seed: this.getSeed(pwd) });
@@ -202,18 +205,20 @@ async function generateKey({ pwd, type, secretToPub, seedToHumanReadable, genera
     const counter = keyStore.seedGeneratedCounter;
 
     // Generate
-    const secret = seedToHumanReadable(this.hdWallet[generateFn](0, 0, counter));
-    const pub = secretToPub(secret);
+    const chain = this.hdWallet[getChain](0, 0, counter);
+    const keys = [];
+    for (let i = 0; i < n; ++i) {
+        const secret = seedToHumanReadable(chain.next());
+        const pub = secretToPub(secret);
+        keys.push({ public: pub, secret });
+    }
 
     // Write
-    keyStore.seedGeneratedCounter++;
-    keyStore.keys[pub] = secret;
+    keyStore.seedGeneratedCounter += n;
+    keys.forEach(k => (keyStore.keys[k.public] = k.secret));
     await this.store.saveKey(type, pwd, keyStore);
 
-    return {
-        public: pub,
-        secret
-    };
+    return keys.length === 1 ? keys[0] : keys;
 }
 
 function getInitialStoreData(data) {

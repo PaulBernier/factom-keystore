@@ -138,12 +138,12 @@ describe('FactomKeyStore', function() {
 
     it('Should generate Factoid address', async function() {
         const ks = new FactomKeyStore({ password: PWD });
-        const seed = bip44.randomMnemonic();
-        await ks.init(seed);
+        const mnemonic = bip44.randomMnemonic();
+        await ks.init(mnemonic);
 
         const address = await ks.generateFactoidAddress();
 
-        const generator = new bip44.FactomBIP44(seed);
+        const generator = new bip44.FactomHDWallet({ mnemonic });
         const factoidAddresses = ks.getAllFactoidAddresses();
         const secretKey = ks.getSecretKey(address.public);
         assert.lengthOf(factoidAddresses, 1);
@@ -155,14 +155,39 @@ describe('FactomKeyStore', function() {
         );
     });
 
+    it('Should generate multiple Factoid addresses', async function() {
+        const ks = new FactomKeyStore({ password: PWD });
+        const mnemonic = bip44.randomMnemonic();
+        await ks.init(mnemonic);
+
+        const addresses = await ks.generateFactoidAddress(3);
+        const addresses2 = await ks.generateFactoidAddress();
+
+        const generator = new bip44.FactomHDWallet({ mnemonic });
+        const factoidAddresses = ks.getAllFactoidAddresses();
+        assert.lengthOf(addresses, 3);
+        assert.lengthOf(factoidAddresses, 4);
+        assert.includeDeepMembers(factoidAddresses, [
+            addresses2.public,
+            ...addresses.map(a => a.public)
+        ]);
+
+        const secretKey = ks.getSecretKey(addresses2.public);
+        assert.strictEqual(secretKey, addresses2.secret);
+        assert.strictEqual(
+            secretKey,
+            seedToPrivateFctAddress(generator.generateFactoidPrivateKey(0, 0, 3))
+        );
+    });
+
     it('Should generate Entry Credit address', async function() {
         const ks = new FactomKeyStore({ password: PWD });
-        const seed = bip44.randomMnemonic();
-        await ks.init(seed);
+        const mnemonic = bip44.randomMnemonic();
+        await ks.init(mnemonic);
 
         const address = await ks.generateEntryCreditAddress();
 
-        const generator = new bip44.FactomBIP44(seed);
+        const generator = new bip44.FactomHDWallet({ mnemonic });
         const ecAddresses = ks.getAllEntryCreditAddresses();
         const secretKey = ks.getSecretKey(address.public);
         assert.lengthOf(ecAddresses, 1);
@@ -174,14 +199,39 @@ describe('FactomKeyStore', function() {
         );
     });
 
+    it('Should generate multiple Entry Credit addresses', async function() {
+        const ks = new FactomKeyStore({ password: PWD });
+        const mnemonic = bip44.randomMnemonic();
+        await ks.init(mnemonic);
+
+        const addresses = await ks.generateEntryCreditAddress(3);
+        const addresses2 = await ks.generateEntryCreditAddress();
+
+        const generator = new bip44.FactomHDWallet({ mnemonic });
+        const factoidAddresses = ks.getAllEntryCreditAddresses();
+        assert.lengthOf(addresses, 3);
+        assert.lengthOf(factoidAddresses, 4);
+        assert.includeDeepMembers(factoidAddresses, [
+            addresses2.public,
+            ...addresses.map(a => a.public)
+        ]);
+
+        const secretKey = ks.getSecretKey(addresses2.public);
+        assert.strictEqual(secretKey, addresses2.secret);
+        assert.strictEqual(
+            secretKey,
+            seedToPrivateEcAddress(generator.generateEntryCreditPrivateKey(0, 0, 3))
+        );
+    });
+
     it('Should generate Entry Credit address', async function() {
         const ks = new FactomKeyStore({ password: PWD });
-        const seed = bip44.randomMnemonic();
-        await ks.init(seed);
+        const mnemonic = bip44.randomMnemonic();
+        await ks.init(mnemonic);
 
         const idKey = await ks.generateIdentityKey();
 
-        const generator = new bip44.FactomBIP44(seed);
+        const generator = new bip44.FactomHDWallet({ mnemonic });
         const identityKeys = ks.getAllIdentityKeys();
         const secretKey = ks.getSecretKey(idKey.public);
         assert.lengthOf(identityKeys, 1);
@@ -193,16 +243,41 @@ describe('FactomKeyStore', function() {
         );
     });
 
+    it('Should generate multiple Identity keys', async function() {
+        const ks = new FactomKeyStore({ password: PWD });
+        const mnemonic = bip44.randomMnemonic();
+        await ks.init(mnemonic);
+
+        const addresses = await ks.generateIdentityKey(3);
+        const addresses2 = await ks.generateIdentityKey();
+
+        const generator = new bip44.FactomHDWallet({ mnemonic });
+        const factoidAddresses = ks.getAllIdentityKeys();
+        assert.lengthOf(addresses, 3);
+        assert.lengthOf(factoidAddresses, 4);
+        assert.includeDeepMembers(factoidAddresses, [
+            addresses2.public,
+            ...addresses.map(a => a.public)
+        ]);
+
+        const secretKey = ks.getSecretKey(addresses2.public);
+        assert.strictEqual(secretKey, addresses2.secret);
+        assert.strictEqual(
+            secretKey,
+            seedToSecretIdentityKey(generator.generateIdentityPrivateKey(0, 0, 3))
+        );
+    });
+
     it('Should increment seed counter', async function() {
         const ks = new FactomKeyStore({ password: PWD });
-        const seed = bip44.randomMnemonic();
-        await ks.init(seed);
+        const mnemonic = bip44.randomMnemonic();
+        await ks.init(mnemonic);
 
         await ks.generateFactoidAddress();
         await ks.generateFactoidAddress();
         const address = await ks.generateFactoidAddress();
 
-        const generator = new bip44.FactomBIP44(seed);
+        const generator = new bip44.FactomHDWallet({ mnemonic });
         const factoidAddresses = ks.getAllFactoidAddresses();
         const secretKey = ks.getSecretKey(address.public);
         assert.lengthOf(factoidAddresses, 3);
