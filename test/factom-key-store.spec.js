@@ -375,4 +375,24 @@ describe('FactomKeyStore', function() {
             ]
         );
     });
+
+    it('Should change password', async function() {
+        const ks = new FactomKeyStore({ password: PWD });
+        await ks.init();
+
+        await ks.import('Fs1wZau1YNto1xCVkELULUHiKaD14LKVTceVdvWEr9PwEDCACCDr');
+        await ks.import('Es3nSPRJoiJcN6U7oX3PMjYBB8R4QBnp3iud9M8S1UQZhn3i1m8T');
+        await ks.changePassword(PWD, 'new_password');
+
+        assert.strictEqual(ks.getPassword(), 'new_password');
+        assert.isString(ks.store.getPrivateKeyData('seed', 'new_password'));
+        assert.strictEqual(
+            ks.getSecretKey('FA33sHHzz1ufCeDJav4SXAKWocsZpJSLffqEXScoADFn3srS6ttM'),
+            'Fs1wZau1YNto1xCVkELULUHiKaD14LKVTceVdvWEr9PwEDCACCDr'
+        );
+        assert.strictEqual(
+            ks.getSecretKey('EC2UBa4yF51DCGko9AS2piSesMWuAJAFnGu6YYoXJ2zjmkts1xAK'),
+            'Es3nSPRJoiJcN6U7oX3PMjYBB8R4QBnp3iud9M8S1UQZhn3i1m8T'
+        );
+    });
 });

@@ -55,6 +55,17 @@ class FactomKeyStore {
         ]);
     }
 
+    async changePassword(oldPassword, newPassword) {
+        const data = this.store.getKeyIDs().map(keyID => ({
+            keyID,
+            privateData: this.store.getPrivateKeyData(keyID, oldPassword),
+            publicData: this.store.getPublicKeyData(keyID)
+        }));
+
+        await this.store.saveKeys(newPassword, data);
+        this.password = newPassword;
+    }
+
     getPassword(password) {
         const pwd = password || this.password;
         if (!pwd) {
