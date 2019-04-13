@@ -238,8 +238,8 @@ function getInitialStoreData(data) {
         fct = EMPTY_KEY_STORE,
         identity = EMPTY_KEY_STORE;
 
-    if (!data) {
-        mnemonic = bip44.randomMnemonic();
+    if (!data || typeof data === 'number') {
+        mnemonic = bip39.generateMnemonic(data);
     } else if (typeof data === 'string') {
         if (bip44.validMnemonic(data)) {
             mnemonic = data;

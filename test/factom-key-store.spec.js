@@ -29,6 +29,22 @@ describe('FactomKeyStore', function() {
         assert.isEmpty(ks.getAllIdentityKeys());
     });
 
+    it('Should initialize new key store with 12-word seed', async function() {
+        const ks = new FactomKeyStore({ password: PWD });
+        await ks.init(128);
+
+        assert.isTrue(bip44.validMnemonic(ks.getMnemonic()));
+        assert.lengthOf(ks.getMnemonic().split(' '), 12);
+    });
+
+    it('Should initialize new key store with 24-word seed', async function() {
+        const ks = new FactomKeyStore({ password: PWD });
+        await ks.init(256);
+
+        assert.isTrue(bip44.validMnemonic(ks.getMnemonic()));
+        assert.lengthOf(ks.getMnemonic().split(' '), 24);
+    });
+
     it('Should initialize key store with seed', async function() {
         const ks = new FactomKeyStore({ password: PWD });
         const mnemonic = bip44.randomMnemonic();
