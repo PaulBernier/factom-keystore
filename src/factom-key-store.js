@@ -39,7 +39,7 @@ class FactomKeyStore {
         const pwd = this.getPassword(password);
 
         const { mnemonic, fct, ec, identity } = getInitialStoreData(data);
-        const seed = await bip39.mnemonicToSeedHexAsync(mnemonic);
+        const seed = await bip39.mnemonicToSeed(mnemonic).then(s => s.toString('hex'));
         this.hdWallet = new bip44.FactomHDWallet({ seed });
 
         await this.store.saveKeys([
