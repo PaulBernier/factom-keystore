@@ -22,7 +22,7 @@ async function createEmptyFile(filePath) {
     await ensureFile(absoluteFilePath);
 }
 
-async function getFileKeyStore(filePath, password) {
+async function openFileKeyStore(filePath, password) {
     const storeData = await readJSON(filePath);
     const persist = getPersistFunction(filePath);
     return new FactomKeyStore({ save: persist, initialData: storeData, password });
@@ -34,5 +34,5 @@ function getPersistFunction(filePath) {
 
 module.exports = {
     createFileKeyStore,
-    getFileKeyStore
+    openFileKeyStore
 };
